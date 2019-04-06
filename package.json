@@ -4,6 +4,7 @@
   "description": "An Electron app to interface with the race result decoder box via tcp",
   "main": "index.js",
   "scripts": {
+    "start": "electron .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
