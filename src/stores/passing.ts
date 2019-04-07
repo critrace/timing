@@ -32,7 +32,10 @@ export default class PassingStore {
           raceId,
         },
       })
-      this._passingsByRaceId[raceId] = data.sort((p1, p2) => p1.passingNumber - p2.passingNumber)
+      this._passingsByRaceId[raceId] = data.sort((p1, p2) => {
+        if (p1.date > p2.date) return 1
+        return -1
+      })
     } catch (err) {
       console.log('Error loading passings', err)
       throw err

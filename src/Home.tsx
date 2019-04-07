@@ -149,8 +149,7 @@ export default class Home extends React.Component<{
             .passingsByRaceId(this.state.activeRaceId)
             .map((passing, index) => (
               <div key={index}>
-                {passing.passingNumber} - {passing.transponder} -{' '}
-                {passing.date.toString()}
+                {passing.transponder} - {passing.date.toString()}
               </div>
             ))}
         </RootCell>

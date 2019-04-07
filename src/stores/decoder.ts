@@ -7,7 +7,6 @@ import EventEmitter from 'events'
 const MIN_PROTOCOL_VERSION = '2.0'
 
 interface Passing {
-  passingNumber: number
   transponder: string
   date: Date
   riderId: string
@@ -91,7 +90,6 @@ export default class DecoderStore extends EventEmitter {
         'YYYY-MM-DD;HH:mm:ss:SSS'
       ).toDate()
       this.emit('passing', {
-        passingNumber: +passingNumber,
         date,
         transponder,
       })
