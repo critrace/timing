@@ -13,10 +13,13 @@ export default class DecoderStore {
   @observable activeProtocolVersion = '1.0'
 
   @observable connection?: net.Socket
-  @observable connected = false
   @computed
   get connecting() {
-    return this.connected === false && this.connection
+    return this.connection && this.connection.connecting
+  }
+  @computed
+  get connected() {
+    return this.connection && this.connection.connecting === false
   }
   timer?: any
   commandPromise = Promise.resolve()
@@ -25,18 +28,21 @@ export default class DecoderStore {
 
   connect() {
     if (this.connection) return
-    this.connection = net.createConnection({
+    const _connection = net.createConnection({
       host: this.activeIp,
       port: this.port,
     })
+    this.connection = _connection
+    this.connection.setTimeout(60000)
     this.connection.on('connect', () => {
-      this.connected = true
       this.setProtocolVersion(MIN_PROTOCOL_VERSION)
       this.loadMode()
       this.setPushPassings(true)
     })
-    this.connection.on('end', () => {
-      this.connected = false
+    this.connection.on('close', () => {
+      clearInterval(this.timer)
+      this.timer = undefined
+      this.connection = undefined
     })
     this.connection.on('data', (data) => {
       this.queuedData += data
@@ -47,7 +53,7 @@ export default class DecoderStore {
       this.queuedData = this.queuedData.split('\n').pop()
     })
     this.timer = setInterval(() => {
-      this.connection.write('PING\n')
+      this.send('PING')
     }, 30000)
   }
 
@@ -67,7 +73,6 @@ export default class DecoderStore {
     clearInterval(this.timer)
     this.timer = undefined
     this.connection.end()
-    this.connection = undefined
   }
 
   send(command: string) {
