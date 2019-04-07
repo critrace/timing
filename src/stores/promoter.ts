@@ -44,10 +44,12 @@ export default class PromoterStore {
     }
   }
 
+  @computed
   get active() {
     return this._promotersById[this.userId] || ({} as Promoter)
   }
 
+  @computed
   get authenticated() {
     return !!this.userId
   }

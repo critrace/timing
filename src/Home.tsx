@@ -3,15 +3,21 @@ import { inject, observer } from 'mobx-react'
 import PromoterStore from './stores/promoter'
 import { RootCell, Input } from './components/Shared'
 import Button from './components/Button'
+import DecoderStore from '../stores/decoder'
 
-@inject('promoter')
+@inject('promoter', 'decoder')
 @observer
 export default class Home extends React.Component<{
   promoter: PromoterStore
+  decoder: DecoderStore
 }> {
   state = {
     email: '',
     password: '',
+    decoderIp: '192.168.2.2',
+  }
+  componentDidMount() {
+    this.props.decoder.activeIp = '192.168.2.2'
   }
   render() {
     return (
@@ -47,6 +53,33 @@ export default class Home extends React.Component<{
             />
           </RootCell>
         )}
+        <RootCell>
+          <Input
+            type="text"
+            onChange={(e: any) => {
+              this.setState({ decoderIp: e.target.value })
+            }}
+            value={this.state.decoderIp}
+          />
+          <Button
+            title={this.props.decoder.connected ? 'Disconnect' : 'Connect'}
+            onClick={() => {
+              if (this.props.decoder.connected) {
+                this.props.decoder.disconnect()
+              } else {
+                this.props.decoder.connect()
+              }
+            }}
+          />
+          {this.props.decoder.connected ? (
+            <div>
+              Connected - Active Protocol:{' '}
+              {this.props.decoder.activeProtocolVersion}
+            </div>
+          ) : (
+            <div>Disconnected</div>
+          )}
+        </RootCell>
       </>
     )
   }
