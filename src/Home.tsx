@@ -94,7 +94,10 @@ export default class Home extends React.Component<{
             }}
           />
           {this.props.decoder.isRecording ? (
-            <div>Recording</div>
+            <div>
+              Recording - Push{' '}
+              {this.props.decoder.isPushEnabled ? 'enabled' : 'disabled'}
+            </div>
           ) : (
             <div>Not recording</div>
           )}
