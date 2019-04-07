@@ -1,5 +1,6 @@
 const path = require('path')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin')
 
 module.exports = {
   mode: 'development',
@@ -23,6 +24,8 @@ module.exports = {
     new HtmlWebpackPlugin({
       template: 'static/index.ejs',
       filename: 'index.html',
+      inlineSource: '.(js|css)',
     }),
+    new HtmlWebpackInlineSourcePlugin(),
   ],
 }
