@@ -1,6 +1,5 @@
 import { computed, observable } from 'mobx'
 import net from 'net'
-import throttle from 'lodash.throttle'
 
 // Version where full push mode introduced
 const MIN_PROTOCOL_VERSION = '2.0'
