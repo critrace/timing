@@ -4,6 +4,7 @@ const HtmlWebpackInlineSourcePlugin = require('html-webpack-inline-source-plugin
 
 module.exports = {
   mode: 'development',
+  target: 'electron-renderer',
   entry: {
     main: './src/index.tsx',
   },
