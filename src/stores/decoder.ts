@@ -38,37 +38,28 @@ export default class DecoderStore {
       }
     )
     this.connection.on('data', (data) => {
-      console.log(data.toString())
       this.queuedData += data
-      let breakIndex = this.queuedData.toString().indexOf('\n')
-      while (breakIndex !== -1) {
-        const command = this.queuedData
-          .toString()
-          .slice(0, breakIndex)
-          .trim()
-        this.queuedData = this.queuedData.toString().slice(breakIndex, -1)
-        this.handleCommand(command.split(';'))
-        breakIndex = this.queuedData.toString().indexOf('\n')
-      }
+      this.queuedData.split('\n').forEach((response: string) => {
+        if (response.trim().length === 0) return
+        this.handleCommand(response.trim().split(';'))
+      })
+      this.queuedData = this.queuedData.split('\n').pop()
     })
-    // this.timer = setInterval(() => {
-    //   this.connection.write('PING\n')
-    // }, 5000)
+    this.timer = setInterval(() => {
+      this.connection.write('PING\n')
+    }, 30000)
   }
 
-  send(command: string) {
-    // Use a long chained promise to ensure commands are only sent once every
-    // WAIT_INTERVAL
-    const WAIT_INTERVAL = 1000
-    this.commandPromise = this.commandPromise.then(() => {
-      if (!this.connected) {
-        console.log(`Not connected, can't send command: ${command}`)
-        return
-      }
-      console.log('sending', command)
-      this.connection.write(`${command}\r\n`)
-      return new Promise((r) => setTimeout(r, WAIT_INTERVAL))
-    })
+  handleCommand(parts: string[] = []) {
+    console.log('receiving', parts.join(';'))
+    if (parts[0] === 'GETMODE') {
+      this.isRecording = parts[1] === 'OPERATION'
+    } else if (parts[0] === 'SETPROTOCOL') {
+      this.activeProtocolVersion = parts[1]
+    } else if (parts[0] === 'SETPUSHPASSINGS') {
+      this.isPushEnabled = +parts[1] === 1
+      if (parts[1] === 'ERROR') console.log('Error setting push mode')
+    }
   }
 
   disconnect() {
@@ -78,20 +69,19 @@ export default class DecoderStore {
     this.connection = undefined
   }
 
-  handleCommand(parts: string[] = []) {
-    if (parts[0] === 'PING') {
-      console.log('Received', parts[1])
-    } else if (parts[0] === 'GETMODE') {
-      this.isRecording = parts[1] === 'OPERATION'
-    } else if (parts[0] === 'SETPROTOCOL') {
-      this.activeProtocolVersion = parts[1]
-    } else if (parts[0] === 'SETPUSHPASSINGS') {
-      console.log(parts[1])
-      this.isPushEnabled = +parts[1] === 1
-      if (parts[1] === 'ERROR') console.log('Error setting push mode')
-    } else {
-      console.log(parts.join(';'))
-    }
+  send(command: string) {
+    const WAIT_INTERVAL = 50
+    // Use a long chained promise to ensure commands are only sent once every
+    // WAIT_INTERVAL ms
+    this.commandPromise = this.commandPromise.then(() => {
+      if (!this.connected) {
+        console.log(`Not connected, can't send command: ${command}`)
+        return
+      }
+      console.log('sending', command)
+      this.connection.write(`${command}\r\n`)
+      return new Promise((r) => setTimeout(r, WAIT_INTERVAL))
+    })
   }
 
   loadMode() {
