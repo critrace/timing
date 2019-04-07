@@ -1,5 +1,11 @@
-import { computed, observable, action, runInAction } from 'mobx'
+import { computed, observable, runInAction } from 'mobx'
 import axios from 'axios'
+import * as fs from 'fs'
+import * as path from 'path'
+import { remote } from 'electron'
+const { app } = remote
+
+console.log(app.getPath('userData'))
 
 export interface Promoter {
   _id: string
@@ -18,14 +24,22 @@ export default class PromoterStore {
   }
 
   constructor() {
-    this._promotersById = {}
-    const active = JSON.parse(localStorage.getItem('promoter'))
-    if (active) {
-      this.userId = active._id
-      this._promotersById[active._id] = active
-    }
-    if (this.authenticated) {
-      this.loadPromoter().catch(() => {})
+    try {
+      const storagePath = path.join(app.getPath('userData'), 'storage.json')
+      if (!fs.existsSync(storagePath)) {
+        fs.writeFileSync(storagePath, JSON.stringify({}))
+      }
+      const data = fs.readFileSync(storagePath, 'utf8')
+      const { active } = JSON.parse(data.toString())
+      if (active) {
+        this.userId = active._id
+        this._promotersById[active._id] = active
+      }
+      if (this.authenticated) {
+        this.loadPromoter().catch(() => {})
+      }
+    } catch (err) {
+      console.log('Error loading user data', err)
     }
   }
 
@@ -101,12 +115,5 @@ export default class PromoterStore {
       console.log(err.response.data.message)
       throw err
     }
-  }
-
-  @action
-  logout() {
-    localStorage.removeItem('token')
-    localStorage.removeItem('promoter')
-    this.userId = ''
   }
 }

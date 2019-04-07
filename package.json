@@ -33,6 +33,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@jchancehud/eslint-config-typescript": "^0.0.5",
     "@types/axios": "^0.14.0",
+    "@types/node": "^11.13.0",
     "@types/react": "^16.8.12",
     "@types/react-dom": "^16.8.3",
     "electron": "^4.1.4",

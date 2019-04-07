@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
 import { Provider } from 'mobx-react'
+import PromoterStore from './stores/promoter'
 
 axios.defaults.baseURL = 'https://api.critresult.com'
 // axios.defaults.baseURL = 'http://localhost:4000'
@@ -12,7 +13,9 @@ Object.assign(document.body.style, {
   'font-family': 'Helvetica',
 })
 
-const stores = {}
+const stores = {
+  promoter: new PromoterStore(),
+}
 
 ReactDOM.render(
   <Provider {...stores}>
