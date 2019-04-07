@@ -68,7 +68,7 @@ export default class Button extends React.Component<{
               opacity: animating ? 1 : 0,
             }}
           >
-            <PuffAnimation height="15" />
+            <PuffAnimation />
           </div>
         </VFlex>
       </div>

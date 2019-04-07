@@ -13,30 +13,31 @@ export default class DecoderStore {
   @observable activeProtocolVersion = '1.0'
 
   @observable connection?: net.Socket
+  @observable connected = false
+  @computed
+  get connecting() {
+    return this.connected === false && this.connection
+  }
   timer?: any
   commandPromise = Promise.resolve()
-
-  @computed
-  get connected() {
-    return !!this.connection
-  }
 
   queuedData: any = ''
 
   connect() {
     if (this.connection) return
-    this.connection = net.createConnection(
-      {
-        host: this.activeIp,
-        port: this.port,
-      },
-      () => {
-        console.log('connected')
-        this.setProtocolVersion(MIN_PROTOCOL_VERSION)
-        this.loadMode()
-        this.setPushPassings(true)
-      }
-    )
+    this.connection = net.createConnection({
+      host: this.activeIp,
+      port: this.port,
+    })
+    this.connection.on('connect', () => {
+      this.connected = true
+      this.setProtocolVersion(MIN_PROTOCOL_VERSION)
+      this.loadMode()
+      this.setPushPassings(true)
+    })
+    this.connection.on('end', () => {
+      this.connected = false
+    })
     this.connection.on('data', (data) => {
       this.queuedData += data
       this.queuedData.split('\n').forEach((response: string) => {

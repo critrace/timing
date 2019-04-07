@@ -43,9 +43,9 @@ export default class Home extends React.Component<{
             />
             <Button
               title="Login"
-              onClick={() => {
+              onClick={() =>
                 this.props.promoter.login(this.state.email, this.state.password)
-              }}
+              }
             />
           </RootCell>
         )}
@@ -58,6 +58,7 @@ export default class Home extends React.Component<{
             value={this.props.decoder.activeIp}
           />
           <Button
+            animating={this.props.decoder.connecting}
             title={this.props.decoder.connected ? 'Disconnect' : 'Connect'}
             onClick={() => {
               if (this.props.decoder.connected) {
