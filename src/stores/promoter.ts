@@ -5,6 +5,8 @@ import * as path from 'path'
 import { remote } from 'electron'
 const { app } = remote
 
+const storagePath = path.join(app.getPath('userData'), 'storage.json')
+
 export interface Promoter {
   _id: string
   createdAt: string
@@ -12,6 +14,7 @@ export interface Promoter {
 }
 
 export default class PromoterStore {
+  @observable token: string
   @observable userId: string
   @observable _promotersById: {
     [key: string]: Promoter
@@ -23,12 +26,12 @@ export default class PromoterStore {
 
   constructor() {
     try {
-      const storagePath = path.join(app.getPath('userData'), 'storage.json')
       if (!fs.existsSync(storagePath)) {
         fs.writeFileSync(storagePath, JSON.stringify({}))
       }
       const data = fs.readFileSync(storagePath, 'utf8')
-      const { active } = JSON.parse(data.toString())
+      const { token, active } = JSON.parse(data.toString())
+      this.token = token
       if (active) {
         this.userId = active._id
         this._promotersById[active._id] = active
@@ -41,22 +44,12 @@ export default class PromoterStore {
     }
   }
 
-  @computed
   get active() {
     return this._promotersById[this.userId] || ({} as Promoter)
   }
 
-  @computed
   get authenticated() {
     return !!this.userId
-  }
-
-  get token() {
-    return localStorage.getItem('token')
-  }
-
-  static activeToken() {
-    return localStorage.getItem('token')
   }
 
   /**
@@ -79,15 +72,21 @@ export default class PromoterStore {
     }
   }
 
-  async signup(email: string, password: string) {
+  async login(email: string, password: string) {
     try {
-      const { data } = await axios.post('/promoters', {
+      const { data } = await axios.post('/promoters/login', {
         email,
         password,
       })
       runInAction(() => {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('promoter', JSON.stringify(data))
+        const fileData = fs.readFileSync(storagePath, 'utf8')
+        const parsed = JSON.parse(fileData.toString())
+        Object.assign(parsed, {
+          token: data.token,
+          active: data,
+        })
+        fs.writeFileSync(storagePath, JSON.stringify(parsed))
+        this.token = data.token
         this._promotersById[data._id] = data
         this.userId = data._id
       })
@@ -97,21 +96,9 @@ export default class PromoterStore {
     }
   }
 
-  async login(email: string, password: string) {
-    try {
-      const { data } = await axios.post('/promoters/login', {
-        email,
-        password,
-      })
-      runInAction(() => {
-        localStorage.setItem('token', data.token)
-        localStorage.setItem('promoter', JSON.stringify(data))
-        this._promotersById[data._id] = data
-        this.userId = data._id
-      })
-    } catch (err) {
-      console.log(err.response.data.message)
-      throw err
-    }
+  logout() {
+    fs.writeFileSync(storagePath, JSON.stringify({}))
+    this.token = undefined
+    this.userId = undefined
   }
 }
