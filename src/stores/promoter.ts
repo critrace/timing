@@ -20,6 +20,7 @@ export default class PromoterStore {
   @observable _promotersById: {
     [key: string]: Promoter
   } = {}
+  @observable races: any[] = []
 
   promotersById(id: string): Promoter {
     return this._promotersById[id] || ({} as Promoter)
@@ -63,6 +64,33 @@ export default class PromoterStore {
   set token(_token) {
     PromoterStore.activeToken = _token
     this._token = _token
+  }
+
+  async loadRaces() {
+    try {
+      const { data } = await axios.get('/races', {
+        params: {
+          token: this.token,
+        },
+      })
+      this.races = data
+    } catch (err) {
+      console.log('Error loading races', err)
+      throw err
+    }
+  }
+
+  async startRace(raceId: string, actualStart = new Date()) {
+    try {
+      await axios.post('/races/start', {
+        token: this.token,
+        _id: raceId,
+        actualStart,
+      })
+    } catch (err) {
+      console.log('Error starting race', err)
+      throw err
+    }
   }
 
   /**

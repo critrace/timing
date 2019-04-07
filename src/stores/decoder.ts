@@ -1,10 +1,21 @@
 import { action, computed, decorate, observable } from 'mobx'
 import net from 'net'
+import moment from 'moment'
+import EventEmitter from 'events'
 
 // Version where full push mode introduced
 const MIN_PROTOCOL_VERSION = '2.0'
 
-export default class DecoderStore {
+interface Passing {
+  passingNumber: number
+  transponder: string
+  date: Date
+  riderId: string
+  raceId: string
+  seriesId: string
+}
+
+export default class DecoderStore extends EventEmitter {
   @observable activeIp: string = '192.168.2.2'
   @observable port: number = 3601
   @observable isRecording = false
@@ -43,7 +54,6 @@ export default class DecoderStore {
       console.log('connected')
       this.setProtocolVersion(MIN_PROTOCOL_VERSION)
       this.loadMode()
-      this.setPushPassings(true)
     })
     this.connection.on('close', () => {
       clearInterval(this.timer)
@@ -74,6 +84,17 @@ export default class DecoderStore {
     } else if (parts[0] === 'SETPUSHPASSINGS') {
       this.isPushEnabled = +parts[1] === 1
       if (parts[1] === 'ERROR') console.log('Error setting push mode')
+    } else if (parts[0] === '#P') {
+      const [_, passingNumber, transponder, _date, time] = parts
+      const date = moment(
+        `${_date};${time}`,
+        'YYYY-MM-DD;HH:mm:ss:SSS'
+      ).toDate()
+      this.emit('passing', {
+        passingNumber: +passingNumber,
+        date,
+        transponder,
+      })
     }
   }
 

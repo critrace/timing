@@ -3,9 +3,14 @@ import axios from 'axios'
 import PromoterStore from './promoter'
 
 export default class PassingStore {
-  @observable passingsByRaceId: {
+  @observable _passingsByRaceId: {
     [key: string]: any
   } = {}
+
+  @observable
+  passingsByRaceId(_id: string) {
+    return this._passingsByRaceId[_id] || []
+  }
 
   async create(model: any) {
     try {
@@ -27,7 +32,7 @@ export default class PassingStore {
           raceId,
         },
       })
-      this.passingsByRaceId[raceId] = data
+      this._passingsByRaceId[raceId] = data.sort((p1, p2) => p1.passingNumber - p2.passingNumber)
     } catch (err) {
       console.log('Error loading passings', err)
       throw err
