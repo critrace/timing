@@ -14,7 +14,8 @@ export interface Promoter {
 }
 
 export default class PromoterStore {
-  @observable token: string
+  static activeToken: string
+  @observable _token: string
   @observable userId: string
   @observable _promotersById: {
     [key: string]: Promoter
@@ -52,6 +53,16 @@ export default class PromoterStore {
   @computed
   get authenticated() {
     return !!this.userId
+  }
+
+  @computed
+  get token() {
+    return this._token
+  }
+
+  set token(_token) {
+    PromoterStore.activeToken = _token
+    this._token = _token
   }
 
   /**

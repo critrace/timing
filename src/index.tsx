@@ -6,6 +6,7 @@ import { Provider } from 'mobx-react'
 import Home from './Home'
 import PromoterStore from './stores/promoter'
 import DecoderStore from './stores/decoder'
+import PassingStore from './stores/passing'
 
 axios.defaults.baseURL = 'https://api.critresult.com'
 // axios.defaults.baseURL = 'http://localhost:4000'
@@ -19,6 +20,7 @@ Object.assign(document.body.style, {
 const stores = {
   promoter: new PromoterStore(),
   decoder: new DecoderStore(),
+  passing: new PassingStore(),
 }
 
 ReactDOM.render(

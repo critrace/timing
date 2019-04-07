@@ -1,4 +1,4 @@
-import { computed, observable } from 'mobx'
+import { action, computed, decorate, observable } from 'mobx'
 import net from 'net'
 
 // Version where full push mode introduced
@@ -10,30 +10,37 @@ export default class DecoderStore {
   @observable isRecording = false
   @observable isPushEnabled = false
   @observable activeProtocolVersion = '1.0'
+  @observable activeRaceId: string
 
   @observable connection?: net.Socket
   @computed
   get connecting() {
-    return this.connection && this.connection.connecting
+    if (!this.connection) return false
+    return this.connection.connecting === true
   }
   @computed
   get connected() {
-    return this.connection && this.connection.connecting === false
+    if (!this.connection) return false
+    return this.connection.connecting === false
   }
   timer?: any
   commandPromise = Promise.resolve()
 
   queuedData: any = ''
 
+  @action
   connect() {
     if (this.connection) return
     const _connection = net.createConnection({
       host: this.activeIp,
       port: this.port,
     })
-    this.connection = _connection
+    this.connection = decorate(_connection, {
+      connecting: observable,
+    })
     this.connection.setTimeout(60000)
     this.connection.on('connect', () => {
+      console.log('connected')
       this.setProtocolVersion(MIN_PROTOCOL_VERSION)
       this.loadMode()
       this.setPushPassings(true)
@@ -42,6 +49,7 @@ export default class DecoderStore {
       clearInterval(this.timer)
       this.timer = undefined
       this.connection = undefined
+      this.isRecording = false
     })
     this.connection.on('data', (data) => {
       this.queuedData += data
@@ -61,6 +69,7 @@ export default class DecoderStore {
     if (parts[0] === 'GETMODE') {
       this.isRecording = parts[1] === 'OPERATION'
     } else if (parts[0] === 'SETPROTOCOL') {
+      // eslint-disable-next-line prefer-destructuring
       this.activeProtocolVersion = parts[1]
     } else if (parts[0] === 'SETPUSHPASSINGS') {
       this.isPushEnabled = +parts[1] === 1
@@ -75,18 +84,12 @@ export default class DecoderStore {
   }
 
   send(command: string) {
-    const WAIT_INTERVAL = 50
-    // Use a long chained promise to ensure commands are only sent once every
-    // WAIT_INTERVAL ms
-    this.commandPromise = this.commandPromise.then(() => {
-      if (!this.connected) {
-        console.log(`Not connected, can't send command: ${command}`)
-        return
-      }
-      console.log('sending', command)
-      this.connection.write(`${command}\r\n`)
-      return new Promise((r) => setTimeout(r, WAIT_INTERVAL))
-    })
+    if (!this.connected) {
+      console.log(`Not connected, can't send command: ${command}`)
+      return
+    }
+    console.log('sending', command)
+    this.connection.write(`${command}\r\n`)
   }
 
   loadMode() {

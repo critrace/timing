@@ -69,12 +69,12 @@ export default class Home extends React.Component<{
             }}
           />
           {this.props.decoder.connected ? (
-            <div>
+            <div style={{ color: 'green' }}>
               Connected - Active Protocol:{' '}
               {this.props.decoder.activeProtocolVersion}
             </div>
           ) : (
-            <div>Disconnected</div>
+            <div style={{ color: 'red' }}>Disconnected</div>
           )}
           <Button
             title={
