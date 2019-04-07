@@ -14,10 +14,6 @@ export default class Home extends React.Component<{
   state = {
     email: '',
     password: '',
-    decoderIp: '192.168.2.2',
-  }
-  componentDidMount() {
-    this.props.decoder.activeIp = '192.168.2.2'
   }
   render() {
     return (
@@ -57,9 +53,9 @@ export default class Home extends React.Component<{
           <Input
             type="text"
             onChange={(e: any) => {
-              this.setState({ decoderIp: e.target.value })
+              this.props.decoder.activeIp = e.target.value
             }}
-            value={this.state.decoderIp}
+            value={this.props.decoder.activeIp}
           />
           <Button
             title={this.props.decoder.connected ? 'Disconnect' : 'Connect'}

@@ -6,7 +6,7 @@ import throttle from 'lodash.throttle'
 const MIN_PROTOCOL_VERSION = '2.0'
 
 export default class DecoderStore {
-  @observable activeIp: string = ''
+  @observable activeIp: string = '192.168.2.2'
   @observable port: number = 3601
   @observable isRecording = false
   @observable isPushEnabled = false
