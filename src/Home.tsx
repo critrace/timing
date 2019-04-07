@@ -79,6 +79,25 @@ export default class Home extends React.Component<{
           ) : (
             <div>Disconnected</div>
           )}
+          <Button
+            title={
+              this.props.decoder.isRecording
+                ? 'Stop Recording'
+                : 'Start Recording'
+            }
+            onClick={() => {
+              if (this.props.decoder.isRecording) {
+                this.props.decoder.setRecording(false)
+              } else {
+                this.props.decoder.setRecording(true)
+              }
+            }}
+          />
+          {this.props.decoder.isRecording ? (
+            <div>Recording</div>
+          ) : (
+            <div>Not recording</div>
+          )}
         </RootCell>
       </>
     )
