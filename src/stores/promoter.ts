@@ -5,8 +5,6 @@ import * as path from 'path'
 import { remote } from 'electron'
 const { app } = remote
 
-console.log(app.getPath('userData'))
-
 export interface Promoter {
   _id: string
   createdAt: string

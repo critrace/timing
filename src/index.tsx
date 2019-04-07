@@ -1,7 +1,9 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { BrowserRouter as Router, Route } from 'react-router-dom'
 import axios from 'axios'
 import { Provider } from 'mobx-react'
+import Home from './Home'
 import PromoterStore from './stores/promoter'
 
 axios.defaults.baseURL = 'https://api.critresult.com'
@@ -19,7 +21,9 @@ const stores = {
 
 ReactDOM.render(
   <Provider {...stores}>
-    <div>hello world</div>
+    <Router>
+      <Route path="/" component={Home} />
+    </Router>
   </Provider>,
   document.getElementById('app')
 )

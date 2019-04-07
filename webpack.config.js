@@ -17,9 +17,7 @@ module.exports = {
     extensions: ['*', '.ts', '.tsx', '.js', '.jsx'],
   },
   module: {
-    rules: [
-      { test: /\.tsx?$/, loader: 'babel-loader' },
-    ],
+    rules: [{ test: /\.tsx?$/, loader: 'babel-loader' }],
   },
   plugins: [
     new HtmlWebpackPlugin({
