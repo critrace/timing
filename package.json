@@ -6,6 +6,7 @@
   "scripts": {
     "clean": "rm -r ./build || true",
     "build": "npm run clean && webpack --config webpack.config.js",
+    "build:production": "npm run build && electron-packager ./ timing --all --overwrite",
     "start": "electron .",
     "lint": "eslint ./src/**.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -19,7 +20,9 @@
       "@jchancehud/eslint-config-typescript"
     ]
   },
-  "author": "Chance Hudson",
+  "author": {
+    "name": "Chance Hudson"
+  },
   "license": "GPL-3.0-or-later",
   "bugs": {
     "url": "https://github.com/critresult/timing/issues"
@@ -39,6 +42,7 @@
     "@types/react-router-dom": "^4.3.1",
     "@types/styled-components": "^4.1.13",
     "electron": "^4.1.4",
+    "electron-packager": "^13.1.1",
     "eslint": "^5.16.0",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
@@ -49,6 +53,7 @@
   "dependencies": {
     "axios": "^0.18.0",
     "babel-loader": "^8.0.5",
+    "electron-debug": "^2.2.0",
     "mobx": "^5.9.4",
     "mobx-react": "^5.4.3",
     "moment": "^2.24.0",
