@@ -33,7 +33,8 @@ export default class DecoderStore {
       () => {
         console.log('connected')
         this.setProtocolVersion(MIN_PROTOCOL_VERSION)
-        this.connection.write('GETMODE\n')
+        this.loadMode()
+        this.setPushPassings(true)
       }
     )
     this.connection.on('data', (data) => {
@@ -93,6 +94,10 @@ export default class DecoderStore {
     }
   }
 
+  loadMode() {
+    this.send('GETMODE')
+  }
+
   setProtocolVersion(version: string) {
     this.send(`SETPROTOCOL;${version}`)
   }
@@ -100,10 +105,14 @@ export default class DecoderStore {
   setRecording(active: boolean = false) {
     this.send(active ? 'STARTOPERATION' : 'STOPOPERATION')
     if (active) {
-      this.send('SETPUSHPASSINGS;1;1')
+      this.setPushPassings(true)
     } else {
-      this.send('SETPUSHPASSINGS;0;0')
+      this.setPushPassings(false)
     }
     this.send('GETMODE')
+  }
+
+  setPushPassings(enabled = false, pushExisting = true) {
+    this.send(`SETPUSHPASSINGS;${enabled ? 1 : 0};${pushExisting ? 1 : 0}`)
   }
 }
