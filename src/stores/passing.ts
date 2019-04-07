@@ -33,7 +33,7 @@ export default class PassingStore {
         },
       })
       this._passingsByRaceId[raceId] = data.sort((p1, p2) => {
-        if (p1.date > p2.date) return 1
+        if (p1.date < p2.date) return 1
         return -1
       })
     } catch (err) {

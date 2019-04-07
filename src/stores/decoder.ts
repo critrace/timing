@@ -6,14 +6,6 @@ import EventEmitter from 'events'
 // Version where full push mode introduced
 const MIN_PROTOCOL_VERSION = '2.0'
 
-interface Passing {
-  transponder: string
-  date: Date
-  riderId: string
-  raceId: string
-  seriesId: string
-}
-
 export default class DecoderStore extends EventEmitter {
   @observable activeIp: string = '192.168.2.2'
   @observable port: number = 3601
@@ -60,14 +52,15 @@ export default class DecoderStore extends EventEmitter {
       this.connection = undefined
       this.isRecording = false
     })
-    this.connection.on('data', (data) => {
+    const dataHandler = (data: any) => {
       this.queuedData += data
       this.queuedData.split('\n').forEach((response: string) => {
         if (response.trim().length === 0) return
         this.handleCommand(response.trim().split(';'))
       })
       this.queuedData = this.queuedData.split('\n').pop()
-    })
+    }
+    this.connection.on('data', dataHandler)
     this.timer = setInterval(() => {
       this.send('PING')
     }, 30000)

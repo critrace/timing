@@ -27,12 +27,15 @@ export default class Home extends React.Component<{
     this.props.decoder.removeListener('passing', this.passingReceived)
   }
 
+  _promise = Promise.resolve()
   passingReceived = (passing: any) => {
-    this.props.passing
-      .create({
-        raceId: this.state.activeRaceId,
-        ...passing,
-      })
+    this._promise = this._promise
+      .then(() =>
+        this.props.passing.create({
+          raceId: this.state.activeRaceId,
+          ...passing,
+        })
+      )
       .then(() => this.props.passing.load(this.state.activeRaceId))
       .then(() => console.log('Created passing'))
       .catch(() => console.log('Error creating passing'))
@@ -108,6 +111,7 @@ export default class Home extends React.Component<{
             }}
             value={this.state.activeRaceId}
           >
+            <option key="none" value="">no race selected</option>
             {this.props.promoter.races.map((race) => (
               <option key={race._id} value={race._id}>
                 {race.series.name} - {race.event.name} - {race.name}
@@ -125,12 +129,15 @@ export default class Home extends React.Component<{
                 onClick={() => {
                   if (this.props.decoder.isRecording) {
                     this.props.decoder.setRecording(false)
-                  } else {
-                    this.props.decoder.setRecording(true)
-                    this.props.promoter
-                      .startRace(this.state.activeRaceId)
-                      .catch(console.log)
+                    return
+                  } else if (!this.state.activeRaceId) {
+                    alert('Select a race before starting a recording')
+                    return
                   }
+                  this.props.decoder.setRecording(true)
+                  this.props.promoter
+                    .startRace(this.state.activeRaceId)
+                    .catch(console.log)
                 }}
               />
               {this.props.decoder.isRecording ? (
