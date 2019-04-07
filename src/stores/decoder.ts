@@ -45,6 +45,7 @@ export default class DecoderStore extends EventEmitter {
       console.log('connected')
       this.setProtocolVersion(MIN_PROTOCOL_VERSION)
       this.loadMode()
+      this.setPushPassings(true, false)
     })
     this.connection.on('close', () => {
       clearInterval(this.timer)
