@@ -26,6 +26,7 @@ export default class PassingCell extends React.Component<{
         <VFlex>{passing.transponder}</VFlex>
         <VFlex>{passing.date.toString()}</VFlex>
         <VFlex>{passing.riderId ? rider.lastname : 'No riderId!'}</VFlex>
+        <VFlex>Lap {`${passing.lapNumber}` || 'Unknown'}</VFlex>
         <Button
           title="Delete"
           style={{ backgroundColor: 'red' }}

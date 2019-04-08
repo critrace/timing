@@ -38,7 +38,11 @@ export default class PassingStore {
           raceId,
         },
       })
+      const passingsByTransponder = {} as { [key: string]: number }
       data.forEach((passing: any) => {
+        passing.lapNumber = passingsByTransponder[passing.transponder] || 0
+        passingsByTransponder[passing.transponder] =
+          (passingsByTransponder[passing.transponder] || 0) + 1
         this._passingById[passing._id] = passing
       })
       this._passingsByRaceId[raceId] = data.sort((p1: any, p2: any) => {
