@@ -5,6 +5,7 @@ import { RootCell, Input, HFlex } from './components/Shared'
 import Button from './components/Button'
 import DecoderStore from '../stores/decoder'
 import PassingStore from '../stores/passing'
+import PassingCell from './components/PassingCell'
 
 @inject('promoter', 'decoder', 'passing')
 @observer
@@ -36,7 +37,7 @@ export default class Home extends React.Component<{
           ...passing,
         })
       )
-      .then(() => this.props.passing.load(this.state.activeRaceId))
+      .then(() => this.props.passing.loadByRaceId(this.state.activeRaceId))
       .then(() => console.log('Created passing'))
       .catch(() => console.log('Error creating passing'))
   }
@@ -107,11 +108,13 @@ export default class Home extends React.Component<{
           <select
             onChange={(e: any) => {
               this.setState({ activeRaceId: e.target.value })
-              this.props.passing.load(e.target.value)
+              this.props.passing.loadByRaceId(e.target.value)
             }}
             value={this.state.activeRaceId}
           >
-            <option key="none" value="">no race selected</option>
+            <option key="none" value="">
+              no race selected
+            </option>
             {this.props.promoter.races.map((race) => (
               <option key={race._id} value={race._id}>
                 {race.series.name} - {race.event.name} - {race.name}
@@ -154,10 +157,8 @@ export default class Home extends React.Component<{
         <RootCell>
           {this.props.passing
             .passingsByRaceId(this.state.activeRaceId)
-            .map((passing, index) => (
-              <div key={index}>
-                {passing.transponder} - {passing.date.toString()}
-              </div>
+            .map((passing: any, index: number) => (
+              <PassingCell key={index} passingId={passing._id} />
             ))}
         </RootCell>
       </>
