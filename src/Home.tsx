@@ -19,13 +19,20 @@ export default class Home extends React.Component<{
     password: '',
     activeRaceId: '',
   }
+  timer: any
   async componentDidMount() {
     await this.props.promoter.loadRaces()
     this.props.decoder.on('passing', this.passingReceived)
+    this.timer = setInterval(
+      () => this.props.passing.loadByRaceId(this.state.activeRaceId),
+      5000
+    )
   }
 
   componentWillUnmount() {
     this.props.decoder.removeListener('passing', this.passingReceived)
+    clearInterval(this.timer)
+    this.timer = undefined
   }
 
   _promise = Promise.resolve()
@@ -37,7 +44,6 @@ export default class Home extends React.Component<{
           ...passing,
         })
       )
-      .then(() => this.props.passing.loadByRaceId(this.state.activeRaceId))
       .then(() => console.log('Created passing'))
       .catch(() => console.log('Error creating passing'))
   }
