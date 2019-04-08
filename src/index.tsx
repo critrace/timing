@@ -8,7 +8,7 @@ import PromoterStore from './stores/promoter'
 import DecoderStore from './stores/decoder'
 import PassingStore from './stores/passing'
 
-axios.defaults.baseURL = 'https://api.critresult.com'
+axios.defaults.baseURL = 'https://api.critrace.com'
 // axios.defaults.baseURL = 'http://localhost:4000'
 axios.defaults.headers['content-type'] = 'application/json'
 
