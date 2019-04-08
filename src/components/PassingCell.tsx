@@ -4,13 +4,15 @@ import PassingStore from '../stores/passing'
 import { HFlex, VFlex } from './Shared'
 import Button from './Button'
 import RiderStore from '../stores/rider'
+import BibStore from '../stores/bib'
 
-@inject('rider', 'passing', 'promoter', 'decoder')
+@inject('bib', 'rider', 'passing', 'promoter', 'decoder')
 @observer
 export default class PassingCell extends React.Component<{
   passingId: string
   passing?: PassingStore
   rider?: RiderStore
+  bib?: BibStore
 }> {
   async componentDidMount() {
     const passing = this.props.passing.passingById(this.props.passingId)
@@ -21,10 +23,13 @@ export default class PassingCell extends React.Component<{
   render() {
     const passing = this.props.passing.passingById(this.props.passingId)
     const rider = this.props.rider.ridersById(passing.riderId)
+    const bibsForRaceId = this.props.bib.bibsByRaceId(passing.raceId)
+    const bib = bibsForRaceId.find((b) => b.riderId === passing.riderId)
     return (
       <HFlex style={{ margin: 4, justifyContent: 'space-between' }}>
         <VFlex>{passing.transponder}</VFlex>
         <VFlex>{passing.date.toString()}</VFlex>
+        <VFlex>{bib ? bib.bibNumber : 'Bib Unknown'}</VFlex>
         <VFlex>{passing.riderId ? rider.lastname : 'No riderId!'}</VFlex>
         <VFlex>Lap {`${passing.lapNumber}` || 'Unknown'}</VFlex>
         <Button

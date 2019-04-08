@@ -6,13 +6,15 @@ import Button from './components/Button'
 import DecoderStore from '../stores/decoder'
 import PassingStore from '../stores/passing'
 import PassingCell from './components/PassingCell'
+import BibStore from '../stores/bib'
 
-@inject('promoter', 'decoder', 'passing')
+@inject('bib', 'promoter', 'decoder', 'passing')
 @observer
 export default class Home extends React.Component<{
-  promoter: PromoterStore
-  decoder: DecoderStore
-  passing: PassingStore
+  promoter?: PromoterStore
+  decoder?: DecoderStore
+  passing?: PassingStore
+  bib?: BibStore
 }> {
   state = {
     email: '',
@@ -46,6 +48,12 @@ export default class Home extends React.Component<{
       )
       .then(() => console.log('Created passing'))
       .catch(() => console.log('Error creating passing'))
+  }
+
+  raceSelectionChanged = (e: any) => {
+    this.setState({ activeRaceId: e.target.value })
+    this.props.passing.loadByRaceId(e.target.value)
+    this.props.bib.loadByRaceId(e.target.value)
   }
 
   render() {
@@ -112,10 +120,7 @@ export default class Home extends React.Component<{
             }}
           />
           <select
-            onChange={(e: any) => {
-              this.setState({ activeRaceId: e.target.value })
-              this.props.passing.loadByRaceId(e.target.value)
-            }}
+            onChange={this.raceSelectionChanged}
             value={this.state.activeRaceId}
           >
             <option key="none" value="">

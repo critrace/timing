@@ -8,9 +8,10 @@ import PromoterStore from './stores/promoter'
 import DecoderStore from './stores/decoder'
 import PassingStore from './stores/passing'
 import RiderStore from './stores/rider'
+import BibStore from './stores/bib'
 
 axios.defaults.baseURL = 'https://api.critrace.com'
-axios.defaults.baseURL = 'http://localhost:4000'
+// axios.defaults.baseURL = 'http://localhost:4000'
 axios.defaults.headers['content-type'] = 'application/json'
 
 Object.assign(document.body.style, {
@@ -23,6 +24,7 @@ const stores = {
   decoder: new DecoderStore(),
   passing: new PassingStore(),
   rider: new RiderStore(),
+  bib: new BibStore(),
 }
 
 ReactDOM.render(
