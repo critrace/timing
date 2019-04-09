@@ -54,24 +54,21 @@ export default class Home extends React.Component<{
 
   _promise = Promise.resolve()
   passingReceived = (passing: any) => {
-    if (!this.state.__sendInSerialQueue) {
-      this.props.passing.create({
-        raceId: this.state.activeRaceId,
-        ...passing,
-      })
-      return
-    }
-    this._promise = this._promise
-      .then(() =>
-        this.props.passing.create({
+    const _create = () =>
+      this.props.passing
+        .create({
           raceId: this.state.activeRaceId,
           ...passing,
         })
-      )
-      .then(() => console.log('Created passing'))
-      .catch(() =>
-        console.log('Error creating passing', JSON.stringify(passing))
-      )
+        .then(() => console.log('Created passing'))
+        .catch(() =>
+          console.log('Error creating passing', JSON.stringify(passing))
+        )
+    if (!this.state.__sendInSerialQueue) {
+      _create()
+      return
+    }
+    this._promise = this._promise.then(() => _create())
   }
 
   raceSelectionChanged = (e: any) => {
@@ -161,44 +158,44 @@ export default class Home extends React.Component<{
             }}
           />
         </RootCell>
-        <RootCell>
-          <LargeText>Race Configuration</LargeText>
-          <HFlex style={{ justifyContent: 'space-around' }}>
-            <VFlex>
-              <select
-                onChange={this.raceSelectionChanged}
-                value={this.state.activeRaceId}
-              >
-                <option key="none" value="">
-                  no race selected
-                </option>
-                {this.props.promoter.races.map((race) => (
-                  <option key={race._id} value={race._id}>
-                    {race.series.name} - {race.event.name} - {race.name}
-                  </option>
-                ))}
-              </select>
-            </VFlex>
-            <VFlex>
-              {this.state.__sendInSerialQueue
-                ? 'Sending using serial queue'
-                : 'Sending in parallel'}
-              <Button
-                title={
-                  this.state.__sendInSerialQueue
-                    ? 'Send in parallel'
-                    : 'Send in serial queue'
-                }
-                onClick={() => {
-                  this.setState({
-                    __sendInSerialQueue: !this.state.__sendInSerialQueue,
-                  })
-                }}
-              />
-            </VFlex>
-          </HFlex>
-          {this.props.decoder.connected ? (
-            <>
+        {this.props.decoder.connected ? (
+          <>
+            <RootCell>
+              <LargeText>Race Configuration</LargeText>
+              <HFlex style={{ justifyContent: 'space-around' }}>
+                <VFlex>
+                  <select
+                    onChange={this.raceSelectionChanged}
+                    value={this.state.activeRaceId}
+                  >
+                    <option key="none" value="">
+                      no race selected
+                    </option>
+                    {this.props.promoter.races.map((race) => (
+                      <option key={race._id} value={race._id}>
+                        {race.series.name} - {race.event.name} - {race.name}
+                      </option>
+                    ))}
+                  </select>
+                </VFlex>
+                <VFlex>
+                  {this.state.__sendInSerialQueue
+                    ? 'Sending using serial queue'
+                    : 'Sending in parallel'}
+                  <Button
+                    title={
+                      this.state.__sendInSerialQueue
+                        ? 'Send in parallel'
+                        : 'Send in serial queue'
+                    }
+                    onClick={() => {
+                      this.setState({
+                        __sendInSerialQueue: !this.state.__sendInSerialQueue,
+                      })
+                    }}
+                  />
+                </VFlex>
+              </HFlex>
               <Button
                 title={
                   this.props.decoder.isRecording
@@ -227,33 +224,36 @@ export default class Home extends React.Component<{
               ) : (
                 <div>Not recording</div>
               )}
-            </>
-          ) : null}
-        </RootCell>
-        <RootCell>
-          <HFlex style={{ justifyContent: 'space-between' }}>
-            <LargeText>Passings</LargeText>
-            <Button
-              title="Add Manual"
-              style={{ backgroundColor: Colors.yellow, color: Colors.black }}
-              onClick={() => {
-                this.setState({ showingManualPassing: true })
-              }}
-            />
-          </HFlex>
-          {this.props.passing
-            .passingsByRaceId(this.state.activeRaceId)
-            .map((passing: any, index: number) => (
-              <PassingCell
-                key={index}
-                passingId={passing._id}
-                style={{
-                  backgroundColor:
-                    index % 2 === 1 ? Colors.white : Colors.whiteDark,
-                }}
-              />
-            ))}
-        </RootCell>
+            </RootCell>
+            <RootCell>
+              <HFlex style={{ justifyContent: 'space-between' }}>
+                <LargeText>Passings</LargeText>
+                <Button
+                  title="Add Manual"
+                  style={{
+                    backgroundColor: Colors.yellow,
+                    color: Colors.black,
+                  }}
+                  onClick={() => {
+                    this.setState({ showingManualPassing: true })
+                  }}
+                />
+              </HFlex>
+              {this.props.passing
+                .passingsByRaceId(this.state.activeRaceId)
+                .map((passing: any, index: number) => (
+                  <PassingCell
+                    key={index}
+                    passingId={passing._id}
+                    style={{
+                      backgroundColor:
+                        index % 2 === 1 ? Colors.white : Colors.whiteDark,
+                    }}
+                  />
+                ))}
+            </RootCell>
+          </>
+        ) : null}
       </>
     )
   }
