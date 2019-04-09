@@ -11,6 +11,7 @@ import Colors from '../Colors'
 @observer
 export default class PassingCell extends React.Component<{
   passingId: string
+  style?: any
   passing?: PassingStore
   rider?: RiderStore
   bib?: BibStore
@@ -36,7 +37,7 @@ export default class PassingCell extends React.Component<{
         }}
       >
         <VFlex>{passing.transponder}</VFlex>
-        <VFlex>{passing.date.toString()}</VFlex>
+        <VFlex>{passing.date && passing.date.toString()}</VFlex>
         <VFlex style={{ minWidth: 100 }}>
           {bib ? bib.bibNumber : 'Bib Unknown'}
         </VFlex>

@@ -1,13 +1,23 @@
 import React from 'react'
 import { inject, observer } from 'mobx-react'
 import PromoterStore from './stores/promoter'
-import { RootCell, Input, HFlex, TitleText } from './components/Shared'
+import {
+  RootCell,
+  Input,
+  HFlex,
+  VFlex,
+  TitleText,
+  ModalContainer,
+  LargeText,
+} from './components/Shared'
 import Button from './components/Button'
 import DecoderStore from '../stores/decoder'
 import PassingStore from '../stores/passing'
 import PassingCell from './components/PassingCell'
 import BibStore from '../stores/bib'
 import Colors from './Colors'
+import Popup from './components/Popup'
+import moment from 'moment'
 
 @inject('bib', 'promoter', 'decoder', 'passing')
 @observer
@@ -21,13 +31,18 @@ export default class Home extends React.Component<{
     email: '',
     password: '',
     activeRaceId: '',
+    showingManualPassing: false,
+    transponder: '',
+    minuteOffset: '',
   }
   timer: any
   async componentDidMount() {
     await this.props.promoter.loadRaces()
     this.props.decoder.on('passing', this.passingReceived)
     this.timer = setInterval(
-      () => this.props.passing.loadByRaceId(this.state.activeRaceId),
+      () =>
+        this.state.activeRaceId &&
+        this.props.passing.loadByRaceId(this.state.activeRaceId),
       5000
     )
   }
@@ -60,6 +75,52 @@ export default class Home extends React.Component<{
   render() {
     return (
       <>
+        <Popup visible={this.state.showingManualPassing}>
+          <ModalContainer>
+            <VFlex>
+              <LargeText>Create Manual</LargeText>
+              <Input
+                type="text"
+                placeholder="transponder"
+                onChange={(e: any) =>
+                  this.setState({ transponder: e.target.value })
+                }
+              />
+              <Input
+                type="text"
+                placeholder="X minutes ago"
+                onChange={(e: any) =>
+                  this.setState({ minuteOffset: e.target.value })
+                }
+              />
+              <HFlex>
+                <Button
+                  title="Create"
+                  onClick={() =>
+                    this.props.passing
+                      .create({
+                        raceId: this.state.activeRaceId,
+                        transponder: this.state.transponder,
+                        date: moment()
+                          .subtract(this.state.minuteOffset, 'minutes')
+                          .toISOString(),
+                      })
+                      .then(() =>
+                        this.setState({ showingManualPassing: false })
+                      )
+                      .catch(() =>
+                        alert('There was a problem creating the passing')
+                      )
+                  }
+                />
+                <Button
+                  title="Cancel"
+                  onClick={() => this.setState({ showingManualPassing: false })}
+                />
+              </HFlex>
+            </VFlex>
+          </ModalContainer>
+        </Popup>
         {this.props.promoter.authenticated ? (
           <RootCell>
             Logged in as {this.props.promoter.active.email}
@@ -167,7 +228,16 @@ export default class Home extends React.Component<{
           ) : null}
         </RootCell>
         <RootCell>
-          <TitleText>Passings</TitleText>
+          <HFlex style={{ justifyContent: 'space-between' }}>
+            <TitleText>Passings</TitleText>
+            <Button
+              title="Add Manual"
+              style={{ backgroundColor: Colors.yellow, color: Colors.black }}
+              onClick={() => {
+                this.setState({ showingManualPassing: true })
+              }}
+            />
+          </HFlex>
           {this.props.passing
             .passingsByRaceId(this.state.activeRaceId)
             .map((passing: any, index: number) => (
