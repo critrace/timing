@@ -5,6 +5,7 @@ import { HFlex, VFlex } from './Shared'
 import Button from './Button'
 import RiderStore from '../stores/rider'
 import BibStore from '../stores/bib'
+import Colors from '../Colors'
 
 @inject('bib', 'rider', 'passing', 'promoter', 'decoder')
 @observer
@@ -26,15 +27,28 @@ export default class PassingCell extends React.Component<{
     const bibsForRaceId = this.props.bib.bibsByRaceId(passing.raceId)
     const bib = bibsForRaceId.find((b) => b.riderId === passing.riderId)
     return (
-      <HFlex style={{ margin: 4, justifyContent: 'space-between' }}>
+      <HFlex
+        style={{
+          margin: 4,
+          justifyContent: 'space-between',
+          padding: 4,
+          ...(this.props.style || {}),
+        }}
+      >
         <VFlex>{passing.transponder}</VFlex>
         <VFlex>{passing.date.toString()}</VFlex>
-        <VFlex>{bib ? bib.bibNumber : 'Bib Unknown'}</VFlex>
-        <VFlex>{passing.riderId ? rider.lastname : 'No riderId!'}</VFlex>
-        <VFlex>Lap {`${passing.lapNumber}` || 'Unknown'}</VFlex>
+        <VFlex style={{ minWidth: 100 }}>
+          {bib ? bib.bibNumber : 'Bib Unknown'}
+        </VFlex>
+        <VFlex style={{ minWidth: 150 }}>
+          {passing.riderId ? rider.lastname : 'No riderId!'}
+        </VFlex>
+        <VFlex style={{ minWidth: 200 }}>
+          Lap {`${passing.lapNumber}` || 'Unknown'}
+        </VFlex>
         <Button
           title="Delete"
-          style={{ backgroundColor: 'red' }}
+          style={{ backgroundColor: Colors.pink }}
           onClick={() =>
             this.props.passing
               .delete(this.props.passingId)

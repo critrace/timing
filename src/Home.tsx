@@ -1,12 +1,13 @@
 import React from 'react'
 import { inject, observer } from 'mobx-react'
 import PromoterStore from './stores/promoter'
-import { RootCell, Input, HFlex } from './components/Shared'
+import { RootCell, Input, HFlex, TitleText } from './components/Shared'
 import Button from './components/Button'
 import DecoderStore from '../stores/decoder'
 import PassingStore from '../stores/passing'
 import PassingCell from './components/PassingCell'
 import BibStore from '../stores/bib'
+import Colors from './Colors'
 
 @inject('bib', 'promoter', 'decoder', 'passing')
 @observer
@@ -166,10 +167,18 @@ export default class Home extends React.Component<{
           ) : null}
         </RootCell>
         <RootCell>
+          <TitleText>Passings</TitleText>
           {this.props.passing
             .passingsByRaceId(this.state.activeRaceId)
             .map((passing: any, index: number) => (
-              <PassingCell key={index} passingId={passing._id} />
+              <PassingCell
+                key={index}
+                passingId={passing._id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 1 ? Colors.white : Colors.whiteDark,
+                }}
+              />
             ))}
         </RootCell>
       </>
