@@ -6,6 +6,7 @@ import Button from './Button'
 import RiderStore from '../stores/rider'
 import BibStore from '../stores/bib'
 import Colors from '../Colors'
+import moment from 'moment'
 
 @inject('bib', 'rider', 'passing', 'promoter', 'decoder')
 @observer
@@ -37,7 +38,7 @@ export default class PassingCell extends React.Component<{
         }}
       >
         <VFlex>{passing.transponder}</VFlex>
-        <VFlex>{passing.date && passing.date.toString()}</VFlex>
+        <VFlex>{moment(passing.date).format('HH:mm:ss:SSS')}</VFlex>
         <VFlex style={{ minWidth: 100 }}>
           {bib ? bib.bibNumber : 'Bib Unknown'}
         </VFlex>

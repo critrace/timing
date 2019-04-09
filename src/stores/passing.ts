@@ -19,7 +19,6 @@ export default class PassingStore {
   }
 
   async create(model: any) {
-    console.log(model)
     try {
       await axios.post('/passings', {
         ...model,
@@ -39,17 +38,21 @@ export default class PassingStore {
           raceId,
         },
       })
-      this._passingsByRaceId[raceId] = data.sort((p1: any, p2: any) => {
+      const sorted = data.sort((p1: any, p2: any) => {
         if (p1.date < p2.date) return 1
         return -1
       })
       const passingsByTransponder = {} as { [key: string]: number }
-      this._passingsByRaceId[raceId].reverse().forEach((passing: any) => {
-        passing.lapNumber = passingsByTransponder[passing.transponder] || 0
-        passingsByTransponder[passing.transponder] =
-          (passingsByTransponder[passing.transponder] || 0) + 1
-        this._passingById[passing._id] = passing
-      })
+      sorted
+        .slice()
+        .reverse()
+        .forEach((passing: any) => {
+          passing.lapNumber = passingsByTransponder[passing.transponder] || 0
+          passingsByTransponder[passing.transponder] =
+            (passingsByTransponder[passing.transponder] || 0) + 1
+          this._passingById[passing._id] = passing
+        })
+      this._passingsByRaceId[raceId] = sorted
     } catch (err) {
       console.log('Error loading passings', err)
       throw err
