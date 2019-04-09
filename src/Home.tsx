@@ -63,7 +63,9 @@ export default class Home extends React.Component<{
         })
       )
       .then(() => console.log('Created passing'))
-      .catch(() => console.log('Error creating passing'))
+      .catch(() =>
+        console.log('Error creating passing', JSON.stringify(passing))
+      )
   }
 
   raceSelectionChanged = (e: any) => {
