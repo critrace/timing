@@ -7,9 +7,10 @@ require('electron-debug')({
 })
 
 app.on('ready', () => {
+  const { width, height } = electron.screen.getPrimaryDisplay().workAreaSize
   const win = new BrowserWindow({
-    width: 800,
-    height: 600,
+    width: Math.min(1000, width),
+    height: Math.min(700, height),
   })
   win.loadFile('build/index.html')
 })

@@ -6,7 +6,6 @@ import {
   Input,
   HFlex,
   VFlex,
-  TitleText,
   ModalContainer,
   LargeText,
 } from './components/Shared'
@@ -29,8 +28,6 @@ export default class Home extends React.Component<{
   bib?: BibStore
 }> {
   state = {
-    email: '',
-    password: '',
     activeRaceId: '',
     showingManualPassing: false,
     transponder: '',
@@ -134,6 +131,7 @@ export default class Home extends React.Component<{
         </Popup>
         <Header />
         <RootCell>
+          <LargeText>Decoder Configuration</LargeText>
           <HFlex>
             <Input
               type="text"
@@ -143,12 +141,12 @@ export default class Home extends React.Component<{
               value={this.props.decoder.activeIp}
             />
             {this.props.decoder.connected ? (
-              <div style={{ color: 'green' }}>
+              <div style={{ color: Colors.green }}>
                 Connected - Active Protocol:{' '}
                 {this.props.decoder.activeProtocolVersion}
               </div>
             ) : (
-              <div style={{ color: 'red' }}>Disconnected</div>
+              <div style={{ color: Colors.pink }}>Disconnected</div>
             )}
           </HFlex>
           <Button
@@ -165,19 +163,40 @@ export default class Home extends React.Component<{
         </RootCell>
         <RootCell>
           <LargeText>Race Configuration</LargeText>
-          <select
-            onChange={this.raceSelectionChanged}
-            value={this.state.activeRaceId}
-          >
-            <option key="none" value="">
-              no race selected
-            </option>
-            {this.props.promoter.races.map((race) => (
-              <option key={race._id} value={race._id}>
-                {race.series.name} - {race.event.name} - {race.name}
-              </option>
-            ))}
-          </select>
+          <HFlex style={{ justifyContent: 'space-around' }}>
+            <VFlex>
+              <select
+                onChange={this.raceSelectionChanged}
+                value={this.state.activeRaceId}
+              >
+                <option key="none" value="">
+                  no race selected
+                </option>
+                {this.props.promoter.races.map((race) => (
+                  <option key={race._id} value={race._id}>
+                    {race.series.name} - {race.event.name} - {race.name}
+                  </option>
+                ))}
+              </select>
+            </VFlex>
+            <VFlex>
+              {this.state.__sendInSerialQueue
+                ? 'Sending using serial queue'
+                : 'Sending in parallel'}
+              <Button
+                title={
+                  this.state.__sendInSerialQueue
+                    ? 'Send in parallel'
+                    : 'Send in serial queue'
+                }
+                onClick={() => {
+                  this.setState({
+                    __sendInSerialQueue: !this.state.__sendInSerialQueue,
+                  })
+                }}
+              />
+            </VFlex>
+          </HFlex>
           {this.props.decoder.connected ? (
             <>
               <Button
