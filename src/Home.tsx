@@ -18,6 +18,7 @@ import BibStore from '../stores/bib'
 import Colors from './Colors'
 import Popup from './components/Popup'
 import moment from 'moment'
+import Header from './components/Header'
 
 @inject('bib', 'promoter', 'decoder', 'passing')
 @observer
@@ -34,6 +35,7 @@ export default class Home extends React.Component<{
     showingManualPassing: false,
     transponder: '',
     minuteOffset: '',
+    __sendInSerialQueue: true,
   }
   timer: any
   async componentDidMount() {
@@ -55,6 +57,13 @@ export default class Home extends React.Component<{
 
   _promise = Promise.resolve()
   passingReceived = (passing: any) => {
+    if (!this.state.__sendInSerialQueue) {
+      this.props.passing.create({
+        raceId: this.state.activeRaceId,
+        ...passing,
+      })
+      return
+    }
     this._promise = this._promise
       .then(() =>
         this.props.passing.create({
@@ -123,37 +132,7 @@ export default class Home extends React.Component<{
             </VFlex>
           </ModalContainer>
         </Popup>
-        {this.props.promoter.authenticated ? (
-          <RootCell>
-            Logged in as {this.props.promoter.active.email}
-            <Button title="Logout" onClick={this.props.promoter.logout} />
-          </RootCell>
-        ) : (
-          <RootCell>
-            <Input
-              type="text"
-              placeholder="email address"
-              onChange={(e: any) => {
-                this.setState({ email: e.target.value })
-              }}
-              value={this.state.email}
-            />
-            <Input
-              type="password"
-              placeholder="password"
-              onChange={(e: any) => {
-                this.setState({ password: e.target.value })
-              }}
-              value={this.state.password}
-            />
-            <Button
-              title="Login"
-              onClick={() =>
-                this.props.promoter.login(this.state.email, this.state.password)
-              }
-            />
-          </RootCell>
-        )}
+        <Header />
         <RootCell>
           <HFlex>
             <Input
@@ -183,6 +162,9 @@ export default class Home extends React.Component<{
               }
             }}
           />
+        </RootCell>
+        <RootCell>
+          <LargeText>Race Configuration</LargeText>
           <select
             onChange={this.raceSelectionChanged}
             value={this.state.activeRaceId}
@@ -231,7 +213,7 @@ export default class Home extends React.Component<{
         </RootCell>
         <RootCell>
           <HFlex style={{ justifyContent: 'space-between' }}>
-            <TitleText>Passings</TitleText>
+            <LargeText>Passings</LargeText>
             <Button
               title="Add Manual"
               style={{ backgroundColor: Colors.yellow, color: Colors.black }}

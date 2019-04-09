@@ -1,5 +1,6 @@
 import { computed, observable, runInAction } from 'mobx'
 import axios from 'axios'
+import omitby from 'lodash.omitby'
 import * as fs from 'fs'
 import * as path from 'path'
 import { remote } from 'electron'
@@ -133,6 +134,22 @@ export default class PromoterStore {
       })
     } catch (err) {
       console.log(err.response.data.message)
+      throw err
+    }
+  }
+
+  async update(promoter: any = {}) {
+    try {
+      const cleanModel = omitby(
+        promoter,
+        (p: any) => typeof p === 'string' && p.trim().length === 0
+      )
+      await axios.put('/promoters', {
+        ...cleanModel,
+        token: this.token,
+      })
+    } catch (err) {
+      console.log('Error updating promoter model', err)
       throw err
     }
   }
