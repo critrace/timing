@@ -18,6 +18,7 @@ import Colors from './Colors'
 import Popup from './components/Popup'
 import moment from 'moment'
 import Header from './components/Header'
+import throttle from 'lodash.throttle'
 
 @inject('bib', 'promoter', 'decoder', 'passing')
 @observer
@@ -38,18 +39,10 @@ export default class Home extends React.Component<{
   async componentDidMount() {
     await this.props.promoter.loadRaces()
     this.props.decoder.on('passing', this.passingReceived)
-    this.timer = setInterval(
-      () =>
-        this.state.activeRaceId &&
-        this.props.passing.loadByRaceId(this.state.activeRaceId),
-      5000
-    )
   }
 
   componentWillUnmount() {
     this.props.decoder.removeListener('passing', this.passingReceived)
-    clearInterval(this.timer)
-    this.timer = undefined
   }
 
   _promise = Promise.resolve()
@@ -61,6 +54,7 @@ export default class Home extends React.Component<{
           ...passing,
         })
         .then(() => console.log('Created passing'))
+        .then(() => this.loadPassings())
         .catch(() =>
           console.log('Error creating passing', JSON.stringify(passing))
         )
@@ -70,6 +64,11 @@ export default class Home extends React.Component<{
     }
     this._promise = this._promise.then(() => _create())
   }
+
+  loadPassings = throttle(
+    () => this.props.passing.loadByRaceId(this.state.activeRaceId),
+    5000
+  )
 
   raceSelectionChanged = (e: any) => {
     this.setState({ activeRaceId: e.target.value })
