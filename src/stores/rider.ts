@@ -29,6 +29,7 @@ export default class RiderStore {
 
   async load(_id: string) {
     try {
+      this._ridersById[_id] = {} as Rider
       const { data } = await axios.get('/riders', {
         params: {
           _id,
