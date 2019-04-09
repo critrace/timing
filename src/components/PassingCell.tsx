@@ -49,12 +49,13 @@ export default class PassingCell extends React.Component<{
         <Button
           title="Delete"
           style={{ backgroundColor: Colors.pink }}
-          onClick={() =>
-            this.props.passing
+          onClick={() => {
+            if (!confirm('Delete passing?')) return
+            return this.props.passing
               .delete(this.props.passingId)
               .then(() => this.props.passing.loadByRaceId(passing.raceId))
               .catch(() => alert('There was a problem deleting this passing.'))
-          }
+          }}
         />
       </HFlex>
     )
