@@ -6,7 +6,6 @@
   "scripts": {
     "clean": "rm -r ./build || true",
     "build": "npm run clean && webpack --config webpack.config.js",
-    "build:production": "npm run build && electron-packager ./ timing --all --overwrite",
     "start": "electron .",
     "lint": "eslint ./src/**.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -44,9 +43,6 @@
     "@types/react-router-dom": "^4.3.1",
     "@types/styled-components": "^4.1.13",
     "electron": "^4.1.4",
-    "electron-packager": "^13.1.1",
-    "electron-winstaller": "^3.0.4",
-    "electron-wix-msi": "^2.1.1",
     "eslint": "^5.16.0",
     "html-webpack-inline-source-plugin": "0.0.10",
     "html-webpack-plugin": "^3.2.0",
