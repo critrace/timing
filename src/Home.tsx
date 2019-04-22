@@ -177,23 +177,6 @@ export default class Home extends React.Component<{
                     ))}
                   </select>
                 </VFlex>
-                <VFlex>
-                  {this.state.__sendInSerialQueue
-                    ? 'Sending using serial queue'
-                    : 'Sending in parallel'}
-                  <Button
-                    title={
-                      this.state.__sendInSerialQueue
-                        ? 'Send in parallel'
-                        : 'Send in serial queue'
-                    }
-                    onClick={() => {
-                      this.setState({
-                        __sendInSerialQueue: !this.state.__sendInSerialQueue,
-                      })
-                    }}
-                  />
-                </VFlex>
               </HFlex>
               <Button
                 title={
