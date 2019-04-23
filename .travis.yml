@@ -1,9 +1,16 @@
 matrix:
   include:
     - os: osx
-      services: docker
       language: nodejs
       node_js: "8"
+    - os: linux
+      language: generic
+      services: docker
 
 script:
-  - npm run build:production
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      npm run build:linux
+    else
+      npm run build:osx
+    fi
