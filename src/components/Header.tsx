@@ -43,7 +43,11 @@ export default class Header extends React.Component<{
     password: '',
     oldPassword: '',
   }
-  onAuthenticated = () => this.setState({ authVisible: false })
+  onAuthenticated = () => {
+    this.props.promoter.loadEvents()
+    this.setState({ authVisible: false })
+  }
+
   onCancelled = () => this.setState({ authVisible: false })
 
   render() {
