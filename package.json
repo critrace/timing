@@ -20,7 +20,8 @@
     "files": [
       "./*.js",
       "./build/**/*"
-    ]
+    ],
+    "artifactName": "critrace-timing-${os}-${version}.${ext}"
   },
   "repository": {
     "type": "git",
