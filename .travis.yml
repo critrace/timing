@@ -10,6 +10,7 @@ matrix:
 script:
   - |
     if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      env | grep -iE 'DEBUG|NODE_|ELECTRON_|NPM_|CI|TRAVIS|_TOKEN|BUILD_' > .env
       npm run build:linux
     else
       npm run build:osx

@@ -9,7 +9,7 @@
     "pack": "npm run build && electron-builder --dir --mac",
     "build:electron": "electron-builder --",
     "build:osx": "electron-builder --mac",
-    "build:linux": "docker run --rm -v ${PWD}:/project electronuserland/builder:wine bash -c 'npm ci && npm run build:electron --windows --linux'",
+    "build:linux": "docker run --rm -v ${PWD}:/project --env-file .env electronuserland/builder:wine bash -c 'npm ci && npm run build:electron --windows --linux'",
     "build:production": "npm run build:linux && npm run build:osx",
     "start": "electron .",
     "lint": "eslint ./src/**.tsx",
