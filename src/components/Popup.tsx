@@ -14,6 +14,7 @@ export default (props: { visible: boolean; children?: any }) => (
           backgroundColor: 'rgba(0, 0, 0, 0.4)',
           alignItems: 'center',
           justifyContent: 'center',
+          zIndex: 10,
         }}
       >
         {props.children}
