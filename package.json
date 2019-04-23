@@ -1,17 +1,26 @@
 {
   "name": "timing",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "An Electron app to interface with the race result decoder box via tcp",
   "main": "index.js",
   "scripts": {
     "clean": "rm -r ./build || true",
     "build": "npm run clean && webpack --config webpack.config.js",
-    "pack": "npm run build && electron-builder --dir --mac",
-    "build:win": "npm run build && electron-builder --windows",
-    "build:production": "npm run build && electron-builder --macos --linux --windows",
+    "build:electron": "npm run build && electron-builder",
+    "build:osx": "npm run build && electron-builder --mac",
+    "build:linux": "docker run --rm -v ${PWD}:/project --env-file .env electronuserland/builder:wine bash -c 'npm i --package-lock=false && npm run build:electron -- --windows --linux'",
+    "build:production": "npm run build:linux && npm run build:osx",
     "start": "electron .",
     "lint": "eslint ./src/**.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.critrace.timing",
+    "files": [
+      "./*.js",
+      "./build/**/*"
+    ],
+    "artifactName": "critrace-timing-${os}-${version}.${ext}"
   },
   "repository": {
     "type": "git",

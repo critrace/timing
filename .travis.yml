@@ -1,5 +1,17 @@
-os: windows
-language: node_js
+matrix:
+  include:
+    - os: osx
+      language: node_js
+      node_js: "8"
+    - os: linux
+      language: generic
+      services: docker
 
 script:
-  - npm run build:win
+  - |
+    if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+      env | grep -v ' ' | grep -iE 'DEBUG|NODE_|ELECTRON_|NPM_|CI|TRAVIS|_TOKEN|BUILD_' > .env
+      npm run build:linux
+    else
+      npm run build:osx
+    fi
