@@ -12,7 +12,7 @@ import BibStore from './stores/bib'
 import Colors from './Colors'
 
 axios.defaults.baseURL = 'https://api.critrace.com'
-axios.defaults.baseURL = 'http://localhost:4000'
+// axios.defaults.baseURL = 'http://localhost:4000'
 axios.defaults.headers['content-type'] = 'application/json'
 
 Object.assign(document.body.style, {
