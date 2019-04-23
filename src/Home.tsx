@@ -45,19 +45,26 @@ export default class Home extends React.Component<{
   }
 
   _promise = Promise.resolve()
+  _createPassing = async (passing: any, eventId: string) => {
+    try {
+      await this.props.passing.create({
+        eventId,
+        ...passing,
+      })
+      console.log('Created passing')
+    } catch (err) {
+      console.log('Error creating passing', err)
+      await new Promise((r) => setTimeout(r, 5000))
+      await this._createPassing(passing, eventId)
+    }
+    this.loadPassings()
+  }
+
   passingReceived = (passing: any) => {
-    const _create = () =>
-      this.props.passing
-        .create({
-          eventId: this.state.activeEventId,
-          ...passing,
-        })
-        .then(() => console.log('Created passing'))
-        .then(() => this.loadPassings())
-        .catch(() =>
-          console.log('Error creating passing', JSON.stringify(passing))
-        )
-    this._promise = this._promise.then(() => _create())
+    this._promise = this._promise.then(() =>
+      this._createPassing(passing, this.state.activeEventId)
+    )
+    return this._promise
   }
 
   loadPassings = throttle(
@@ -95,22 +102,15 @@ export default class Home extends React.Component<{
               <HFlex>
                 <Button
                   title="Create"
-                  onClick={() =>
-                    this.props.passing
-                      .create({
-                        eventId: this.state.activeEventId,
-                        transponder: this.state.transponder,
-                        date: moment()
-                          .subtract(this.state.minuteOffset, 'minutes')
-                          .toISOString(),
-                      })
-                      .then(() =>
-                        this.setState({ showingManualPassing: false })
-                      )
-                      .catch(() =>
-                        alert('There was a problem creating the passing')
-                      )
-                  }
+                  onClick={() => {
+                    this.passingReceived({
+                      transponder: this.state.transponder,
+                      date: moment()
+                        .subtract(this.state.minuteOffset, 'minutes')
+                        .toISOString(),
+                    })
+                    this.setState({ showingManualPassing: false })
+                  }}
                 />
                 <Button
                   title="Cancel"
