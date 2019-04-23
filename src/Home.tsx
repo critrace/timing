@@ -29,7 +29,7 @@ export default class Home extends React.Component<{
   bib?: BibStore
 }> {
   state = {
-    activeRaceId: '',
+    activeEventId: '',
     showingManualPassing: false,
     transponder: '',
     minuteOffset: '',
@@ -37,7 +37,7 @@ export default class Home extends React.Component<{
   }
   timer: any
   async componentDidMount() {
-    await this.props.promoter.loadRaces()
+    await this.props.promoter.loadEvents()
     this.props.decoder.on('passing', this.passingReceived)
   }
 
@@ -50,7 +50,7 @@ export default class Home extends React.Component<{
     const _create = () =>
       this.props.passing
         .create({
-          raceId: this.state.activeRaceId,
+          eventId: this.state.activeEventId,
           ...passing,
         })
         .then(() => console.log('Created passing'))
@@ -66,14 +66,14 @@ export default class Home extends React.Component<{
   }
 
   loadPassings = throttle(
-    () => this.props.passing.loadByRaceId(this.state.activeRaceId),
+    () => this.props.passing.loadByRaceId(this.state.activeEventId),
     5000
   )
 
-  raceSelectionChanged = (e: any) => {
-    this.setState({ activeRaceId: e.target.value })
-    this.props.passing.loadByRaceId(e.target.value)
-    this.props.bib.loadByRaceId(e.target.value)
+  eventSelectionChanged = (e: any) => {
+    this.setState({ activeEventId: e.target.value })
+    this.props.passing.loadByEventId(e.target.value)
+    this.props.bib.loadByEventId(e.target.value)
   }
 
   render() {
@@ -103,7 +103,7 @@ export default class Home extends React.Component<{
                   onClick={() =>
                     this.props.passing
                       .create({
-                        raceId: this.state.activeRaceId,
+                        eventId: this.state.activeEventId,
                         transponder: this.state.transponder,
                         date: moment()
                           .subtract(this.state.minuteOffset, 'minutes')
@@ -157,22 +157,22 @@ export default class Home extends React.Component<{
             }}
           />
         </RootCell>
-        {this.props.decoder.connected ? (
+        {!this.props.decoder.connected ? (
           <>
             <RootCell>
               <LargeText>Race Configuration</LargeText>
               <HFlex style={{ justifyContent: 'space-around' }}>
                 <VFlex>
                   <select
-                    onChange={this.raceSelectionChanged}
-                    value={this.state.activeRaceId}
+                    onChange={this.eventSelectionChanged}
+                    value={this.state.activeEventId}
                   >
                     <option key="none" value="">
-                      no race selected
+                      no event selected
                     </option>
-                    {this.props.promoter.races.map((race) => (
-                      <option key={race._id} value={race._id}>
-                        {race.series.name} - {race.event.name} - {race.name}
+                    {this.props.promoter.events.map((event) => (
+                      <option key={event._id} value={event._id}>
+                        {event.series.name} - {event.name}
                       </option>
                     ))}
                   </select>
@@ -188,14 +188,15 @@ export default class Home extends React.Component<{
                   if (this.props.decoder.isRecording) {
                     this.props.decoder.setRecording(false)
                     return
-                  } else if (!this.state.activeRaceId) {
+                  } else if (!this.state.activeEventId) {
                     alert('Select a race before starting a recording')
                     return
                   }
                   this.props.decoder.setRecording(true)
-                  this.props.promoter
-                    .startRace(this.state.activeRaceId)
-                    .catch(console.log)
+                  // Todo: handle race start times more cleanly (maybe on the website)
+                  // this.props.promoter
+                  //   .startRace(this.state.activeRaceId)
+                  //   .catch(console.log)
                 }}
               />
               {this.props.decoder.isRecording ? (
@@ -222,7 +223,7 @@ export default class Home extends React.Component<{
                 />
               </HFlex>
               {this.props.passing
-                .passingsByRaceId(this.state.activeRaceId)
+                .passingsByEventId(this.state.activeEventId)
                 .map((passing: any, index: number) => (
                   <PassingCell
                     key={index}

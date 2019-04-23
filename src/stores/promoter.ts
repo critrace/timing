@@ -22,6 +22,7 @@ export default class PromoterStore {
     [key: string]: Promoter
   } = {}
   @observable races: any[] = []
+  @observable events: any[] = []
 
   promotersById(id: string): Promoter {
     return this._promotersById[id] || ({} as Promoter)
@@ -77,6 +78,20 @@ export default class PromoterStore {
       this.races = data
     } catch (err) {
       console.log('Error loading races', err)
+      throw err
+    }
+  }
+
+  async loadEvents() {
+    try {
+      const { data } = await axios.get('/events', {
+        params: {
+          token: this.token,
+        },
+      })
+      this.events = data
+    } catch (err) {
+      console.log('Error loading events', err)
       throw err
     }
   }
