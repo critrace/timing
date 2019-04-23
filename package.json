@@ -7,11 +7,20 @@
     "clean": "rm -r ./build || true",
     "build": "npm run clean && webpack --config webpack.config.js",
     "pack": "npm run build && electron-builder --dir --mac",
-    "build:win": "npm run build && electron-builder --windows",
-    "build:production": "npm run build && electron-builder --macos --linux --windows",
+    "build:electron": "electron-builder --",
+    "build:osx": "electron-builder --mac",
+    "build:linux": "docker run --rm -v ${PWD}:/project -v ~/.cache/electron: electronuserland/builder:wine bash -c 'npm ci && npm run build:electron --windows --linux'",
+    "build:production": "npm run build:linux && npm run build:osx",
     "start": "electron .",
     "lint": "eslint ./src/**.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "build": {
+    "appId": "com.critrace.timing",
+    "files": [
+      "./*.js",
+      "./build/**/*"
+    ]
   },
   "repository": {
     "type": "git",
