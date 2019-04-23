@@ -6,8 +6,8 @@
   "scripts": {
     "clean": "rm -r ./build || true",
     "build": "npm run clean && webpack --config webpack.config.js",
-    "build:electron": "electron-builder",
-    "build:osx": "electron-builder --mac",
+    "build:electron": "npm run build && electron-builder",
+    "build:osx": "npm run build && electron-builder --mac",
     "build:linux": "docker run --rm -v ${PWD}:/project --env-file .env electronuserland/builder:wine bash -c 'npm i --package-lock=false && npm run build:electron -- --windows --linux'",
     "build:production": "npm run build:linux && npm run build:osx",
     "start": "electron .",
