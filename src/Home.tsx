@@ -33,7 +33,6 @@ export default class Home extends React.Component<{
     showingManualPassing: false,
     transponder: '',
     minuteOffset: '',
-    __sendInSerialQueue: true,
   }
   timer: any
   async componentDidMount() {
@@ -58,15 +57,11 @@ export default class Home extends React.Component<{
         .catch(() =>
           console.log('Error creating passing', JSON.stringify(passing))
         )
-    if (!this.state.__sendInSerialQueue) {
-      _create()
-      return
-    }
     this._promise = this._promise.then(() => _create())
   }
 
   loadPassings = throttle(
-    () => this.props.passing.loadByRaceId(this.state.activeEventId),
+    () => this.props.passing.loadByEventId(this.state.activeEventId),
     5000
   )
 
@@ -157,86 +152,81 @@ export default class Home extends React.Component<{
             }}
           />
         </RootCell>
-        {!this.props.decoder.connected ? (
-          <>
-            <RootCell>
-              <LargeText>Race Configuration</LargeText>
-              <HFlex style={{ justifyContent: 'space-around' }}>
-                <VFlex>
-                  <select
-                    onChange={this.eventSelectionChanged}
-                    value={this.state.activeEventId}
-                  >
-                    <option key="none" value="">
-                      no event selected
-                    </option>
-                    {this.props.promoter.events.map((event) => (
-                      <option key={event._id} value={event._id}>
-                        {event.series.name} - {event.name}
-                      </option>
-                    ))}
-                  </select>
-                </VFlex>
-              </HFlex>
-              <Button
-                title={
-                  this.props.decoder.isRecording
-                    ? 'Stop Recording'
-                    : 'Start Recording'
-                }
-                onClick={() => {
-                  if (this.props.decoder.isRecording) {
-                    this.props.decoder.setRecording(false)
-                    return
-                  } else if (!this.state.activeEventId) {
-                    alert('Select a race before starting a recording')
-                    return
-                  }
-                  this.props.decoder.setRecording(true)
-                  // Todo: handle race start times more cleanly (maybe on the website)
-                  // this.props.promoter
-                  //   .startRace(this.state.activeRaceId)
-                  //   .catch(console.log)
+        <RootCell>
+          <LargeText>Race Configuration</LargeText>
+          <HFlex style={{ justifyContent: 'space-around' }}>
+            <VFlex>
+              <select
+                onChange={this.eventSelectionChanged}
+                value={this.state.activeEventId}
+              >
+                <option key="none" value="">
+                  no event selected
+                </option>
+                {this.props.promoter.events.map((event) => (
+                  <option key={event._id} value={event._id}>
+                    {event.series.name} - {event.name}
+                  </option>
+                ))}
+              </select>
+            </VFlex>
+          </HFlex>
+          <Button
+            title={
+              this.props.decoder.isRecording
+                ? 'Stop Recording'
+                : 'Start Recording'
+            }
+            onClick={() => {
+              if (this.props.decoder.isRecording) {
+                this.props.decoder.setRecording(false)
+                return
+              } else if (!this.state.activeEventId) {
+                alert('Select a race before starting a recording')
+                return
+              } else if (!this.props.decoder.connected) {
+                alert('Connect decoder box to start recording')
+                return
+              }
+              this.props.decoder.setRecording(true)
+            }}
+          />
+          {this.props.decoder.isRecording ? (
+            <div>
+              Recording - Push{' '}
+              {this.props.decoder.isPushEnabled ? 'enabled' : 'disabled'}
+            </div>
+          ) : (
+            <div>Not recording</div>
+          )}
+        </RootCell>
+        <RootCell>
+          <HFlex style={{ justifyContent: 'space-between' }}>
+            <LargeText>Passings</LargeText>
+            <Button
+              title="Add Manual"
+              style={{
+                backgroundColor: Colors.yellow,
+                color: Colors.black,
+              }}
+              onClick={() => {
+                this.setState({ showingManualPassing: true })
+              }}
+            />
+          </HFlex>
+          {this.props.passing
+            .passingsByEventId(this.state.activeEventId)
+            .map((passing: any, index: number) => (
+              <PassingCell
+                key={index}
+                passingId={passing._id}
+                style={{
+                  backgroundColor:
+                    index % 2 === 1 ? Colors.white : Colors.whiteDark,
                 }}
               />
-              {this.props.decoder.isRecording ? (
-                <div>
-                  Recording - Push{' '}
-                  {this.props.decoder.isPushEnabled ? 'enabled' : 'disabled'}
-                </div>
-              ) : (
-                <div>Not recording</div>
-              )}
-            </RootCell>
-            <RootCell>
-              <HFlex style={{ justifyContent: 'space-between' }}>
-                <LargeText>Passings</LargeText>
-                <Button
-                  title="Add Manual"
-                  style={{
-                    backgroundColor: Colors.yellow,
-                    color: Colors.black,
-                  }}
-                  onClick={() => {
-                    this.setState({ showingManualPassing: true })
-                  }}
-                />
-              </HFlex>
-              {this.props.passing
-                .passingsByEventId(this.state.activeEventId)
-                .map((passing: any, index: number) => (
-                  <PassingCell
-                    key={index}
-                    passingId={passing._id}
-                    style={{
-                      backgroundColor:
-                        index % 2 === 1 ? Colors.white : Colors.whiteDark,
-                    }}
-                  />
-                ))}
-            </RootCell>
-          </>
-        ) : null}
+            ))}
+        </RootCell>
       </>
     )
   }
