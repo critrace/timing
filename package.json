@@ -1,6 +1,6 @@
 {
   "name": "timing",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "An Electron app to interface with the race result decoder box via tcp",
   "main": "index.js",
   "scripts": {
