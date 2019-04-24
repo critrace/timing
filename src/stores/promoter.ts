@@ -96,19 +96,6 @@ export default class PromoterStore {
     }
   }
 
-  async startRace(raceId: string, actualStart = new Date()) {
-    try {
-      await axios.post('/races/start', {
-        token: this.token,
-        _id: raceId,
-        actualStart,
-      })
-    } catch (err) {
-      console.log('Error starting race', err)
-      throw err
-    }
-  }
-
   /**
    * Call with arguments to filter, otherwise retrieve own profile
    **/
